@@ -68,7 +68,7 @@
 
     $tudo_ok = true;
     if ($accept == "text/plain") {
-        echo "AVASUS health checker: $accept\n";
+        echo "Moodle health checker: $accept\n";
         foreach ($checks as $check) {
             $tudo_ok = $tudo_ok && $check[1];
             $status = $check[1] ? "OK" : "FAIL";
@@ -79,7 +79,7 @@
         http_response_code($tudo_ok ? 200 : 510);
     } else {
         echo '<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">';
-        echo "<h1>AVASUS health checker: $accept</h1><table class='table table-striped table-hover'><thead><tr><th>Check</th><th>Status</th></tr></thead><tbody class='table-group-divider'>";
+        echo "<h1>Moodle health checker: $accept</h1><table class='table table-striped table-hover'><thead><tr><th>Check</th><th>Status</th></tr></thead><tbody class='table-group-divider'>";
         foreach ($checks as $check) {
             $tudo_ok = $tudo_ok && $check[1];
             $status = $check[1] ? "✅" : "❌";
