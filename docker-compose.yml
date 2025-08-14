@@ -1,0 +1,80 @@
+services:
+    db:
+        image: postgres:17-alpine
+        ports:
+            - 5417:5432
+        environment:
+            - POSTGRES_HOST=db
+            - POSTGRES_PORT=5432
+            - POSTGRES_DATABASE=postgres
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=postgres
+        command: >
+            -c work_mem=500MB -c maintenance_work_mem=500MB -c max_wal_size=10GB
+        volumes:
+            # database data
+            - "moodle_db:/var/lib/postgresql/data"
+        healthcheck:
+            test: [ "CMD", "psql", "-h", "127.0.0.1", "-U", "postgres" ]
+            interval: 3s
+            timeout: 3s
+            retries: 3
+            start_period: 10s
+
+    ava:
+        image: meu/moodle:4.5.6.001
+        build:
+            context: .
+        ports:
+            - 80:80
+        environment:
+            - CFG_DBHOST=db
+            - CFG_DBPORT=5432
+            - CFG_DBNAME=postgres
+            - CFG_DBUSER=postgres
+            - CFG_DBPASS=postgres
+
+            - CFG_ENV=local
+            - CFG_DEBUG=false
+            - CFG_PREFIX=mdl_
+            - CFG_WWWROOT=http://localhost
+            - CFG_PROBES_TOKEN=changeme
+            - CFG_PROBES_MAINTENANCE=true
+            - CFG_PROBES_SESSION_REDIS=true
+            - CFG_PROBES_CACHE_REDIS=true
+            - CFG_PROBES_POSTGRESQL=true
+            - CFG_PROBES_CRONJOB=true
+            - CFG_PROBES_TASKS=true
+            - CFG_PROBES_DEBUG=false
+            - CFG_PROBES_AUTOMATIC_BACKUP=true
+            - CFG_PROBES_STATISCTICS=true
+            - CFG_PROBES_ANALYTICS=true
+            - CFG_PROBES_WEBSERVICES=true
+            - CFG_PROBES_DBSYNC=true
+
+            # Usado apenas em tempo de install, pode até ser apagado depois da instalação inicial
+            - CFG_ADMINUSER=admin
+            - CFG_ADMINPASS=admin
+            - CFG_ADMINEMAIL=admin@server.local
+            - CFG_FULLNAME=AVASUS
+            - CFG_SHORTNAME=AVASUS
+
+        volumes:
+            # Data
+            - "moodle_data:/var/www/moodledata"
+
+            # Logs
+            - "moodle_logs:/var/log/moodle"
+            - "moodle_apache2logs:/var/log/apache2"
+
+        depends_on:
+            db:
+                condition: service_healthy
+        command:
+            - apache2-foreground
+
+volumes:
+    moodle_db:
+    moodle_data:
+    moodle_logs:
+    moodle_apache2logs:
